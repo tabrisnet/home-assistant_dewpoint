@@ -2,8 +2,9 @@
   "domain": "dewpoint",
   "name": "DewPoint Sensor Calculator",
   "documentation": "https://github.com/miguelangel-nubla/home-assistant-dewpoint",
+  "issue_tracker": "https://github.com/miguelangel-nubla/home-assistant-dewpoint/issues",
   "dependencies": [],
   "codeowners": ["@miguelangel-nubla"],
-  "requirements": ["psychrolib==2.1.0"],
-  "version": "1.0.0"
+  "requirements": ["psychrolib==2.5.0"],
+  "version": "1.0.1"
 }
