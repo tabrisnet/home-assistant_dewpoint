@@ -12,6 +12,7 @@ import voluptuous as vol
 
 
 from homeassistant import util
+from homeassistant.util.unit_conversion import TemperatureConverter
 from homeassistant.core import callback
 from homeassistant.const import (
     UnitOfTemperature, ATTR_FRIENDLY_NAME, ATTR_ENTITY_ID, CONF_SENSORS,
@@ -99,7 +100,7 @@ class DewPointSensor(Entity):
     @property
     def unit_of_measurement(self):
         """Return the unit of measurement."""
-        return UnitOfTemperature.CELSIUS
+        return self.hass.config.units.temperature_unit
 
     @callback
     def get_dry_temp(self, entity):
@@ -119,7 +120,8 @@ class DewPointSensor(Entity):
 
         # convert to celsius if necessary
         if unit == UnitOfTemperature.FAHRENHEIT:
-            return util.temperature.fahrenheit_to_celsius(temp)
+            #return util.unit_conversion.TemperatureConverter.fahrenheit_to_celsius(temp)
+            return util.unit_conversion.TemperatureConverter.convert(temp, unit, UnitOfTemperature.CELSIUS)
         if unit == UnitOfTemperature.CELSIUS:
             return temp
         _LOGGER.error("Temp sensor %s has unsupported unit: %s (allowed: %s, "
@@ -171,3 +173,5 @@ class DewPointSensor(Entity):
             psychrolib.SetUnitSystem(psychrolib.SI)
             TDewPoint = psychrolib.GetTDewPointFromRelHum(dry_temp, rel_hum)
             self._state = round(TDewPoint, 1)
+            if self.hass.config.units.temperature_unit != UnitOfTemperature.CELSIUS:
+                self._state = util.unit_conversion.TemperatureConverter.convert(self._state, UnitOfTemperature.CELSIUS, self.hass.config.units.temperature_unit)
