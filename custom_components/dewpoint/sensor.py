@@ -13,12 +13,12 @@ import voluptuous as vol
 
 from homeassistant import util
 from homeassistant.util.unit_conversion import TemperatureConverter
-from homeassistant.core import callback
+from homeassistant.core import Event, EventStateChangedData, callback
 from homeassistant.const import (
     UnitOfTemperature, ATTR_FRIENDLY_NAME, ATTR_ENTITY_ID, CONF_SENSORS,
     EVENT_HOMEASSISTANT_START, ATTR_UNIT_OF_MEASUREMENT, ATTR_TEMPERATURE)
 from homeassistant.helpers.entity import Entity, async_generate_entity_id
-from homeassistant.helpers.event import async_track_state_change
+from homeassistant.helpers.event import async_track_state_change_event
 import homeassistant.helpers.config_validation as cv
 
 from homeassistant.components.sensor import (
@@ -67,14 +67,14 @@ class DewPointSensor(Entity):
     async def async_added_to_hass(self):
         """Register callbacks."""
         @callback
-        def sensor_state_listener(entity, old_state, new_state):
+        def sensor_state_listener(event: Event[EventStateChangedData]) -> None:
             """Handle device state changes."""
             self.async_schedule_update_ha_state(True)
 
         @callback
         def sensor_startup(event):
             """Update template on startup."""
-            async_track_state_change(
+            async_track_state_change_event(
                 self.hass, [self._entity_dry_temp, self._entity_rel_hum], sensor_state_listener)
 
             self.async_schedule_update_ha_state(True)
