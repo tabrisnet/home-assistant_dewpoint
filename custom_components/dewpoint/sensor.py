@@ -10,6 +10,7 @@ import asyncio
 
 import voluptuous as vol
 
+import hashlib
 
 from homeassistant import util
 from homeassistant.util.unit_conversion import TemperatureConverter
@@ -63,6 +64,10 @@ class DewPointSensor(Entity):
 
         self._entity_dry_temp = entity_dry_temp
         self._entity_rel_hum = entity_rel_hum
+        md5_object = hashlib.new('md5')
+        uniqueid_string = entity_dry_temp + entity_rel_hum + self.entity_id
+        md5_object.update(uniqueid_string.encode())
+        self._attr_unique_id = "dewpoint_" + md5_object.hexdigest()
 
     async def async_added_to_hass(self):
         """Register callbacks."""
